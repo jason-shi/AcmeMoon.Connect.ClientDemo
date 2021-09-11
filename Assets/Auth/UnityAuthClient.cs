@@ -27,7 +27,9 @@ namespace Assets
             // On Ios, we use SFSafariViewController to achieve single-sign-on.
             // See: https://www.youtube.com/watch?v=DdQTXrk6YTk
             // And for unity integration, see: https://qiita.com/lucifuges/items/b17d602417a9a249689f (Google translate to English!)
-#if UNITY_ANDROID
+#if UNITY_EDITOR
+            Browser = new PCBrowser();
+#elif UNITY_ANDROID
             Browser = new AndroidChromeCustomTabBrowser();
 #elif UNITY_IOS
             Browser = new SFSafariViewBrowser();
@@ -60,9 +62,15 @@ namespace Assets
                 ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect,
                 Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
                 Browser = Browser,
-                
             };
             options.Policy.Discovery.RequireHttps = false;
+
+#if UNITY_EDITOR
+            var pcBrower = Browser as PCBrowser;
+            options.RedirectUri = pcBrower.Path + ":" + pcBrower.Port;
+            options.PostLogoutRedirectUri = pcBrower.Path + ":" + pcBrower.Port;
+#endif
+
 
             options.LoggerFactory.AddProvider(new UnityAuthLoggerProvider());
             return new OidcClient(options);
@@ -75,6 +83,7 @@ namespace Assets
             do
             {
                 _client = CreateAuthClient();
+
                 try
                 {
                     _result = await _client.LoginAsync(new LoginRequest());

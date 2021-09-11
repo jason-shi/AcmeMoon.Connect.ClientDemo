@@ -6,9 +6,9 @@ namespace Assets
 {
     public abstract class MobileBrowser : IBrowser
     {
-        private TaskCompletionSource<BrowserResult> _task;
+        protected TaskCompletionSource<BrowserResult> _task;
 
-        public Task<BrowserResult> InvokeAsync(BrowserOptions options)
+        public virtual Task<BrowserResult> InvokeAsync(BrowserOptions options)
         {
             _task = new TaskCompletionSource<BrowserResult>();
             Launch(options.StartUrl);
