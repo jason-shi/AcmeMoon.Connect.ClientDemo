@@ -130,9 +130,10 @@ namespace Assets
                 context.Response.OutputStream.Flush();
             }
             context.Response.Close();
-
-            if(null != Callback)
+            _listener.Stop();
+            if (null != Callback)
                 Callback(context.Request.RawUrl);
+
         }
 
     }
